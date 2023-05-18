@@ -1,0 +1,45 @@
+module car_parking_system(
+    input logic front_sensor,
+    input logic back_sensor,
+    input logic [3:0] password,
+    input logic [3:0] input_password,
+    output logic gate_open
+);
+
+    enum logic [2:0] {
+        IDLE,
+        WAIT_FOR_PASSWORD,
+        PASSWORD_VERIFIED,
+        CAR_EXIT
+    } state, next_state;
+
+    always_ff @(posedge front_sensor or posedge back_sensor or posedge input_password) begin
+        if (front_sensor)
+            next_state <= WAIT_FOR_PASSWORD;
+        else if (back_sensor)
+            next_state <= CAR_EXIT;
+        else if (input_password != 4'b0000)
+            next_state <= PASSWORD_VERIFIED;
+        else
+            next_state <= IDLE;
+    end
+
+    always_ff @(posedge front_sensor or posedge back_sensor or posedge input_password) begin
+        if (front_sensor)
+            state <= next_state;
+        else if (back_sensor)
+            state <= next_state;
+        else if (input_password != 4'b0000)
+            state <= next_state;
+        else
+            state <= next_state;
+    end
+
+    always_ff @(posedge front_sensor or posedge back_sensor or posedge input_password) begin
+        if (state == PASSWORD_VERIFIED)
+            gate_open <= 1'b1;
+        else
+            gate_open <= 1'b0;
+    end
+
+endmodule
